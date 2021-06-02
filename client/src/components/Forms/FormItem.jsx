@@ -2,18 +2,38 @@ import React, { Component } from "react";
 import LocationAutoComplete from "../LocationAutoComplete";
 import Button from "../Base/Button";
 import "../../styles/form.css";
+import axios from "axios";
 
 class ItemForm extends Component {
   state = {};
 
   handleChange(event) {
     console.log("Wax On Wax Off");
-    this.setState({});
+    
+    this.setState({[event.target.name]: event.target.value,});
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
     console.log("Wax On Wax Off");
+      const newItem = {
+        name: this.state.name,
+        description: this.state.description,
+        image: this.state.image,
+        category: this.state.category,
+        quantity: this.state.quantity,
+        address: this.state.address,
+        contact: this.state.contact,
+      };
+      axios
+        .post("http://localhost:4000/api/item", newItem)
+        .then((res) => {
+          console.log(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    };
 
     // In order to send back the data to the client, since there is an input type file you have to send the
     // data as formdata.
@@ -21,7 +41,7 @@ class ItemForm extends Component {
     // Check out the stackoverflow solution below : )
 
     // Nested object into formData by user Vladimir "Vladi vlad" Novopashin @stackoverflow : ) => https://stackoverflow.com/a/42483509
-  };
+  //};
 
   handlePlace = (place) => {
     // This handle is passed as a callback to the autocomplete component.
@@ -33,7 +53,7 @@ class ItemForm extends Component {
   render() {
     return (
       <div className="ItemForm-container">
-        <form className="form">
+        <form className="form" >
           <h2 className="title">Add Item</h2>
 
           <div className="form-group">

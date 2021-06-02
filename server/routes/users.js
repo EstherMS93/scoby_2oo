@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const User = require("./../models/User");
 const Item = require("./../models/Item")
-const bcrypt = require("bcrypt");
+//const bcrypt = require("bcrypt");
 const protectRoute = require("./../middlewares/protectRoute")
 
 /*router.get("/me", function (req, res, next) {
@@ -12,10 +12,11 @@ const protectRoute = require("./../middlewares/protectRoute")
 //Get route for userpage
 router.get('/me', protectRoute, function (req, res, next) {
   User.findById(req.session.currentUser)
+  .select("-password") //to avoid updating the password, which will probably require a different route
     .then((currentUser) => {
       res.status(200).json(currentUser);
       console.log(res)
-    }).catch((error) => { console.log(error) })
+    }).catch((error) => { res.status(500).json(error) })
 });
 
 //Get route for user items
@@ -25,11 +26,14 @@ router.get('/me/items', protectRoute, function (req, res, next) {
     .then((itemsFromDb) => {
       res.status(200).json(itemsFromDb)
       console.log(res)
-    }).catch((error) => { console.log(error) })
+    }).catch((error) => { res.status(500).json(error) })
 });
 //Patch route
 
 router.patch('/me', protectRoute, function (req, res, next) {
+  if (req.body.password) {
+    return res.status(400).json({message : "Password field was sent..."});
+  }
   User.findByIdAndUpdate(req.session.currentUser, req.body, {
     new: true,
   }).then((updatedUser) => {
